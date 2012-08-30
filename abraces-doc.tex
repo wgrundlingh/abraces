@@ -1,0 +1,143 @@
+% $Id: abraces-doc.tex,v 1.0 2012/01/01 00:00:00 wgrundlingh stable $
+\RequirePackage{xcolor}% http://ctan.org/pkg/xcolor (required to "overload" color package)
+\documentclass{ltxdockit}[2011/03/25]
+%\usepackage{xspace}% http://ctan.org/pkg/xspace (already loaded by ltxdockit)
+\usepackage[overload]{abraces}% http://ctan.org/pkg/abraces
+\usepackage{booktabs}% http://ctan.org/pkg/booktabs
+\usepackage{shortvrb}% http://ctan.org/pkg/shortvrb
+\MakeShortVerb{\|}
+
+\rcsid{$Id: abraces.tex,v 1.0 2012/08/30 00:00:00 wgrundlingh stable $}
+%\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{4}
+
+\newsavebox{\codebox}% For storing code segments in footer.
+\newcommand*{\abraces}{Abraces\xspace}
+\newcommand*{\abracesctan}{http://ctan.org/pkg/abraces}
+
+\lstset{
+  language={[LaTeX]TeX},
+  morekeywords={aoverbrace,aunderbrace,color,bracetext,bracescript,foxanddog}
+}
+
+\titlepage{%
+  title={The \sty{abraces} Package},
+  subtitle={Arbitrary or asymmetric braces},
+  url={\abracesctan},
+  author={Werner Grundlingh},
+  email={latex.abraces@gmail.com},
+  revision={\rcsrevision},
+  date={\rcstoday}}
+
+\hypersetup{%
+  pdftitle={The abraces Package},
+  pdfsubject={Arbitrary or asymmetric braces},
+  pdfauthor={Werner Grundlingh},
+  pdfkeywords={tex, latex, references, cross-reference, labels}}
+
+\setcounter{secnumdepth}{4}
+
+\begin{document}
+
+\printtitlepage
+\tableofcontents
+
+\section{Introduction} \label{intro}
+
+The \sty{abraces}\footnote{The \sty{abraces} package: \url{http://ctan.org/pkg/abraces}} package provides a key-driven interface to suppliment new constructions of the traditional \lstinline!\overbrace! and \lstinline!\underbrace! pairs.
+
+%\section{User Guide} \label{user-guide}
+%\subsection{Package Options} \label{package-options}
+
+\section{User interface} \label{user-interface}
+
+\sty{abraces} defines two counterparts to the existing braces:
+
+\begin{ltxsyntax}
+
+\cmditem{aoverbrace}[spec]{stuff}
+
+\cmditem{aunderbrace}[spec]{stuff}
+
+\end{ltxsyntax}
+
+These create an overbrace and underbrace where \prm{spec} define a construction pattern based on the elements in Table~\ref{tab:abrace-spec}.
+
+\begin{table}
+  \centering
+  \begin{tabular}{cl}
+    \toprule
+    \prm{spec} character & Output \\
+    \midrule
+    |l| & $\bracelu$ \\
+    |L| & $\braceld$ \\
+    |r| & $\braceru$ \\
+    |R| & $\bracerd$ \\
+    |U| & $\braceru\bracelu$ \\
+    |D| & $\bracerd\braceld$ \\
+    |0| & (single) Empty fill \\
+    |1|,\ldots,\verb|9| & Copies of regular fill \rule[.4ex]{2em}{1.5pt} \\
+    |@{|\prm{stuff}|}| & Places \prm{stuff} into brace \\
+    |!{|\prm{len}|}| & Regular fill of length \prm{len} \\
+    \bottomrule
+  \end{tabular}
+  \caption{Character specifications \prm{spec} used to construct braces.}
+  \label{tab:abrace-spec}
+\end{table}
+
+The provided interface is based on a ratio-principle, allowing one to put a larger share of ``filler'' (the horizontal rule) at any location within the brace construction. The traditional \lstinline!\overbrace! and \lstinline!\underbrace! pairs have a \mbox{1:1} share between the left and right side (either side of the tip/cust of the brace). Using a \mbox{1:2} ratio would place the brace cusp one third (from the left) into the brace. Similary a \mbox{3:2} ratio would place the cusp 40\% (or two fifths) from the right edge of the brace.
+
+Other, more complex construction -- by means of the optional \prm{spec} argument -- can also be made by mixing the elements presented in Table~\ref{tab:abrace-spec}.
+
+\section{Examples}
+
+Some examples of the types of braces that can be constructed using \sty{abraces}:
+
+\begin{lstlisting}
+\newcommand{\foxanddog}{%
+  \textrm{The quick brown fox jumped over the lazy dog}}
+\end{lstlisting}
+
+\newcommand{\foxanddog}{%
+  \textrm{The quick brown fox jumped over the lazy dog}}
+\begin{itemize}
+  \item \lstinline!\aoverbrace{\foxanddog}! (traditional \lstinline!\overbrace!): \\ $\aoverbrace{\foxanddog}$
+  \item \lstinline!\aunderbrace{\foxanddog}! (traditional \lstinline!\underbrace!): \\ $\aunderbrace{\foxanddog}$
+  \item \lstinline!\aoverbrace[L3U1R]{\foxanddog}!: \\ $\aoverbrace[L3U1R]{\foxanddog}$
+  \item \lstinline!\aoverbrace[l1D1r]{\foxanddog}!: \\ $\aoverbrace[l1D1r]{\foxanddog}$
+  \item \lstinline!\aunderbrace[l2D7r]{\foxanddog}!: \\ $\aunderbrace[l2D7r]{\foxanddog}$
+  \item \lstinline!\aunderbrace[l1D2U2D1r]{\foxanddog}!: \\ $\aunderbrace[l1D2U2D1r]{\foxanddog}$
+  \item \lstinline!\aoverbrace[L1R]{\foxanddog}!: \\ $\aoverbrace[L1R]{\foxanddog}$
+  \item \lstinline!\aunderbrace[L1U3R]{\foxanddog}!: \\ $\aunderbrace[L1U3R]{\foxanddog}$
+  \item \lstinline!\aunderbrace[l6R0l3D3r0L6r]{\foxanddog}!: \\ $\aunderbrace[l6R0l3D3r0L6r]{\foxanddog}$
+  \item \lstinline!\aoverbrace[L501010105U501010105R]{\foxanddog}!: \\ $\aoverbrace[L501010105U501010105R]{\foxanddog}$
+  \item \lstinline!\aunderbrace[l1@{\hspace{5em}}2D2@{\hspace{3em}}1r]{\foxanddog}!: \\ $\aunderbrace[l1@{\hspace{5em}}2D2@{\hspace{3em}}1r]{\foxanddog}$
+  \item \lstinline~\aunderbrace[l1R@{\color{red!80!white}}L1r]{\foxanddog}~: \\ $\aunderbrace[l1R@{\color{red!80!white}}L1r]{\foxanddog}$
+  \item \lstinline~\aoverbrace[L1D!{5em}R]{\foxanddog}~: \\ $\aoverbrace[L1D!{5em}R]{\foxanddog}$
+\end{itemize}
+
+Your next question might be how to add context to the brace cusps. Here's a possible way to insert text at the appropriate ratio, using the above construction techniques:
+
+\newcommand{\bracetext}[1]{%
+  \makebox[0pt][c]{\scriptsize#1}}%
+\[
+  \overbrace[L2U2D1U1R]{\foxanddog}^{%
+    \bracescript{L2r@{\bracetext{left}}l2D1r@{\bracetext{right}}l1R}%
+    }%
+\]
+
+\begin{lstlisting}
+\newcommand{\bracetext}[1]{%
+  \makebox[0pt][c]{\scriptsize#1}}%
+\[
+  \overbrace[L2U2D1U1R]{\foxanddog}^{%
+    \bracescript{L2r@{\bracetext{left}}l2D1r@{\bracetext{right}}l1R}%
+    }%
+\]
+\end{lstlisting}
+
+\section{Terms of reference}
+
+This package originated from a question on the TeX StackEchange network called \href{http://tex.stackexchange.com/q/68526/5764}{Asymmetric overbrace}. Some code was taken from the \sty{mathtools}\footnote{The \sty{mathtools} package: \url{http://ctan.org/pkg/mathtools}} package.
+
+\end{document}
