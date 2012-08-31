@@ -1,4 +1,4 @@
-% $Id: abraces-doc.tex,v 1.0 2012/08/24 00:00:00 wgrundlingh stable $
+% $Id: abraces-doc.tex,v 1.0 2012/08/31 00:00:00 wgrundlingh stable $
 \RequirePackage{xcolor}% http://ctan.org/pkg/xcolor (required to "overload" color package)
 \documentclass{ltxdockit}[2011/03/25]
 %\usepackage{xspace}% http://ctan.org/pkg/xspace (already loaded by ltxdockit)
@@ -8,20 +8,28 @@
 \usepackage{amsmath}% http://ctan.org/pkg/amsmath
 \MakeShortVerb{\|}
 
-\rcsid{$Id: abraces.tex,v 1.0 2012/08/24 00:00:00 wgrundlingh stable $}
+\rcsid{$Id: abraces.tex,v 1.0 2012/08/31 00:00:00 wgrundlingh stable $}
 %\setcounter{secnumdepth}{2}
-\setcounter{tocdepth}{4}
+%\setcounter{tocdepth}{4}
 
 \newsavebox{\codebox}% For storing code segments in footer.
 \newcommand*{\abracesctan}{http://ctan.org/pkg/abraces}
 
 \lstset{
   language={[LaTeX]TeX},
-  morekeywords={aoverbrace,aunderbrace,color,bracetext,bracescript,foxanddog}
+  morekeywords={%
+    aoverbrace,
+    aunderbrace,
+    color,
+    bracetext,
+    bracescript,
+    foxanddog,
+    newcolumntype,
+    newbracespec}
 }
 
 \titlepage{%
-  title={The \sty{abraces} Package},
+  title={The \sty{abraces} package},
   subtitle={Asymmetric or arbitrary braces},
   url={\abracesctan},
   author={Werner Grundlingh},
@@ -35,8 +43,6 @@
   pdfauthor={Werner Grundlingh},
   pdfkeywords={tex, latex, braces, overbrace, underbrace, math-mode}}
 
-\setcounter{secnumdepth}{4}
-
 \begin{document}
 
 \printtitlepage
@@ -44,7 +50,7 @@
 
 \section{Introduction} \label{intro}
 
-The \sty{abraces}\footnote{The \sty{abraces} package: \url{http://ctan.org/pkg/abraces}} package provides a key-driven interface to suppliment new constructions of the traditional \lstinline!\overbrace! and \lstinline!\underbrace! pairs.
+The \sty{abraces}\footnote{The \sty{abraces} package: \url{http://ctan.org/pkg/abraces}} package provides a character key-driven interface to supplement new constructions of the traditional \lstinline!\overbrace! and \lstinline!\underbrace! pairs in an asymmetric or arbitrary way.
 
 \section{User interface} \label{user-interface}
 
@@ -56,13 +62,22 @@ The \sty{abraces}\footnote{The \sty{abraces} package: \url{http://ctan.org/pkg/a
 
 \cmditem{aunderbrace}[spec]{stuff}
 
-\end{ltxsyntax}
-
 These create an overbrace and underbrace where \prm{spec} defines a construction pattern based on the elements in Table~\ref{tab:abrace-spec}.
 
 The provided interface is based on a ratio-principle, allowing one to put a larger share of ``filler'' (the horizontal rule) at any location within the brace construction. The traditional \lstinline!\overbrace! and \lstinline!\underbrace! pairs have a \mbox{1:1} share between the left and right side (either side of the tip/cust of the brace). Using a \mbox{1:2} ratio would place the brace cusp one third (from the left) into the brace. Similary a \mbox{3:2} ratio would place the cusp 40\% (or two fifths) from the right edge of the brace.
 
 Other, more complex construction -- by means of the optional \prm{spec} argument -- can also be made by mixing the elements presented in Table~\ref{tab:abrace-spec}.
+
+\cmditem{newbracespec}{char}{spec}
+
+This allows the user to define a new brace specification \prm{char} the results in the (possibly complex) construction \prm{spec}. The usage is similar to that of a \lstinline!\newcolumntype! construction provided by the \sty{array}\footnote{The \sty{array} package: \url{http://ctan.org/pkg/array}} package.
+
+\cmditem{bracescript}{spec}
+
+Since the brace cusps may not fall directly at the horizontal centre of the construction, \lstinline|\bracescript| is provided that takes a similar construction-style interface to that of \prm{spec} in \lstinline|\aoverbrace| and \lstinline|\aunderbrace|. This allows the user to position the scripted text at the location(s) best-suited for presentation.
+
+\end{ltxsyntax}
+
 
 \begin{table}[t]
   \centering
@@ -77,9 +92,10 @@ Other, more complex construction -- by means of the optional \prm{spec} argument
     |U| & $\braceru\bracelu$ \\
     |D| & $\bracerd\braceld$ \\
     |0| & (single) Empty fill \\
-    |1|,\ldots,\verb|9| & Copies of regular fill \rule[.4ex]{2em}{1.5pt} \\
+    |1|, \ldots,\verb|9| & Copies of regular fill \rule[.4ex]{2em}{1.5pt} \\
     |@{|\prm{stuff}|}| & Places \prm{stuff} into brace \\
     |!{|\prm{len}|}| & Regular fill of length \prm{len} \\
+    |*{|\prm{num}|}{|\prm{stuff}|}| & Repeat \prm{stuff} a total of \prm{num} times \\
     \bottomrule
   \end{tabular}
   \caption{Character specifications \prm{spec} used to construct braces.}
@@ -92,7 +108,7 @@ If the package is loaded with the \lstinline!overload! option
 \usepackage[overload]{abraces}
 \end{lstlisting}
 
-\noindent the traditional \lstinline!\overbrace! and \lstinline!\underbrace! pairs are redefined to be equivalent to \lstinline!\aoverbrace! and \lstinline!\aunderbrace! respectively via a straight-forward \lstinline!\let!:
+\noindent the traditional \lstinline!\overbrace! and \lstinline!\underbrace! pairs are redefined to be equivalent to \lstinline!\aoverbrace! and \lstinline!\aunderbrace!, respectively, via a straight-forward \lstinline!\let!:
 
 \begin{lstlisting}
 \let\overbrace\aoverbrace
@@ -120,7 +136,7 @@ Some examples of the types of braces that can be constructed using \sty{abraces}
   \item \lstinline!\aoverbrace[L1R]{\foxanddog}!: \\ $\aoverbrace[L1R]{\foxanddog}$
   \item \lstinline!\aunderbrace[L1U3R]{\foxanddog}!: \\ $\aunderbrace[L1U3R]{\foxanddog}$
   \item \lstinline!\aunderbrace[l6R0l3D3r0L6r]{\foxanddog}!: \\ $\aunderbrace[l6R0l3D3r0L6r]{\foxanddog}$
-  \item \lstinline!\aoverbrace[L501010105U501010105R]{\foxanddog}!: \\ $\aoverbrace[L501010105U501010105R]{\foxanddog}$
+  \item \lstinline!\aoverbrace[L5*{3}{01}05U50*{3}{10}5R]{\foxanddog}!: \\ $\aoverbrace[L5*{3}{01}05U50*{3}{10}5R]{\foxanddog}$
   \item \lstinline!\aunderbrace[l1@{\hspace{5em}}2D2@{\hspace{3em}}1r]{\foxanddog}!: \\ $\aunderbrace[l1@{\hspace{5em}}2D2@{\hspace{3em}}1r]{\foxanddog}$
   \item \lstinline~\aunderbrace[l1R@{\color{red!80!white}}L1r]{\foxanddog}~: \\ $\aunderbrace[l1R@{\color{red!80!white}}L1r]{\foxanddog}$
   \item \lstinline~\aoverbrace[L1D!{5em}R]{\foxanddog}~: \\ $\aoverbrace[L1D!{5em}R]{\foxanddog}$
@@ -146,10 +162,8 @@ The next question might be how to add content to the brace cusps. Here's a possi
 \]
 \end{lstlisting}
 
-\lstinline!\bracescript! is provided as part of the \sty{abraces} package and provides a similar \prm{spec} construction interface.
-
 \begin{lrbox}{\codebox}\footnotesize\lstinline!\overbrace!\end{lrbox}% Capture code in \codebox
-Another usage might include ``breaking'' a brace across lines to indicate a continuous grouping of objects. The following example\footnote{Taken from the question \href{http://tex.stackexchange.com/q/25510/5764}{\usebox{\codebox} split accross multiple lines} on the TeX StackExchange network.} constructs two open-ended \lstinline!\aoverbrace!s which ``spans'' multiple lines:
+Another usage might include ``breaking'' a brace across lines to indicate a continuous grouping of objects. The following example\footnote{Taken from the question \href{http://tex.stackexchange.com/q/25510/5764}{\usebox{\codebox} split across multiple lines} on the TeX StackExchange network.} constructs two open-ended \lstinline!\aoverbrace!s which ``spans'' multiple lines:
 
 \begin{multline*}
   f(x)=a_0+a_1x+a_2x^2+
@@ -170,8 +184,31 @@ Another usage might include ``breaking'' a brace across lines to indicate a cont
 \end{multline*}
 \end{lstlisting}
 
+As a final example, consider a brace that should include a dashed component. Using \lstinline|\newbracespec| one can define your own dashed component:
+
+\begin{lstlisting}
+\newbracespec{d}{%
+  5@{\hspace{4pt}}1@{\hspace{4pt}}!{2em}@{\hspace{4pt}}1@{\hspace{4pt}}5%
+}
+\end{lstlisting}
+
+\noindent and then use
+
+\begin{lstlisting}
+\[
+  \aunderbrace[l*{3}{d}D*{3}{d}r]{\foxanddog}_
+    {\bracetext{What happened to the cat?}}
+\]
+\end{lstlisting}
+
+\newbracespec{d}{1@{\hspace{4pt}}1@{\hspace{4pt}}!{1em}@{\hspace{4pt}}1@{\hspace{4pt}}1}
+
+\[ \aunderbrace[l*{3}{d}D*{3}{d}r]{\foxanddog}_{\bracetext{What happened to the cat?}} \]
+
 \section{Terms of reference}
 
 This package originated from a question on the TeX StackEchange network called \href{http://tex.stackexchange.com/q/68526/5764}{Asymmetric overbrace}. Some code was taken from the \sty{mathtools}\footnote{The \sty{mathtools} package: \url{http://ctan.org/pkg/mathtools}} package.
+
+This material is released under and subject to the \href{http://www.ctan.org/tex-archive/help/Catalogue/licenses.lppl.html}{LaTeX Project Public Licence}.
 
 \end{document}
