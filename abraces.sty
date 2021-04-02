@@ -1,5 +1,25 @@
+%% abraces.sty
+%% Copyright 2021 Werner Grundlingh
+%
+% This work may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either version 1.3
+% of this license or (at your option) any later version.
+% The latest version of this license is in
+%   http://www.latex-project.org/lppl.txt
+% and version 1.3 or later is part of all distributions of LaTeX
+% version 2005/12/01 or later.
+%
+% This work has the LPPL maintenance status `maintained'.
+% 
+% The Current Maintainer of this work is Werner Grundlingh.
+%
+% This work consists of the file abraces.sty.
+
 \ProvidesPackage{abraces}% http://ctan.org/pkg/abraces
-  [2012/08/24 v1.0 Arbitrary and asymmetric braces]
+  [2021/03/31 v2.0 Arbitrary and asymmetric braces]
+
+\RequirePackage{xparse}
+
 \newif\if@overload
 \DeclareOption{overload}{\@overloadtrue}
 \ProcessOptions
@@ -25,42 +45,231 @@
 \def\aupbracefill#1{$\m@th\setbox\z@\hbox{$\braceld$}\genbrace{#1}$}
 \def\adownbracefill#1{$\m@th\setbox\z@\hbox{$\braceld$}\genbrace{#1}$}
 
+\DeclareDocumentCommand{\downbracketend}{ O{.7\fontdimen5\textfont2} }{%
+  \@use@rl@se
+    {\sbox\z@{$\braceld$}%
+    \dimen@\ht\z@ \advance\dimen@#1\relax
+    \vrule \@width\ht\z@ \@height\ht\z@ \@depth\dimexpr\dimen@-\ht\z@}%
+    \@genbrace}
+
+\DeclareDocumentCommand{\upbracketend}{ O{.7\fontdimen5\textfont2} }{%
+  \@use@rl@se
+    {\sbox\z@{$\bracelu$}%
+    \dimen@\ht\z@ \advance\dimen@#1\relax
+    \vrule \@width\ht\z@ \@height\dimen@ \@depth\z@}%
+    \@genbrace}
+
 % Repetition structure. Reference:
 %   Repeat command n times?
 %   http://tex.stackexchange.com/q/16189/5764
-% Alternatively
-%   \RequirePackage{expl3}% http://ctan.org/pkg/expl3
-%   \ExplSyntaxOn
-%   \cs_new_eq:NN \Repeat \prg_replicate:nn
-%   \ExplSyntaxOff
+\ExplSyntaxOn
+\cs_new_eq:NN \Repeat \prg_replicate:nn
+%FMi
+\cs_new_eq:NN \TrimArgSpaces \tl_trim_spaces:n  % only needed when ^{...} should be text
+%FMi
+\ExplSyntaxOff
 
-\newcommand{\Repeat}[1]{%
-  \expandafter\@Repeat\expandafter{\the\numexpr #1\relax}%
-}
-\def\@Repeat#1{%
-    \ifnum#1>0
-        \expandafter\@@Repeat\expandafter{\the\numexpr #1-1\expandafter\relax\expandafter}%
-    \else
-        \expandafter\@gobble
-    \fi
-}
-\def\@@Repeat#1#2{%
-    \@Repeat{#1}{#2}#2%
-}
 % Taken from mathtools package (http://ctan.org/pkg/mathtools)
-\newcommand{\aunderbrace}[2][l1D1r]{%
+\DeclareDocumentCommand{\aunderbrace}{ O{l1D1r} m o e{^_}}{%
   \begin{lrbox}{\bracebox}$\displaystyle{#2}$\end{lrbox}%
   \mathop{\vtop{\m@th\ialign{##\crcr
     $\hfil\displaystyle{#2}\hfil$\crcr
     \noalign{\kern.7\fontdimen5\textfont2\nointerlineskip}%
-    \aupbracefill{#1}\crcr\noalign{\kern.5\fontdimen5\textfont2}}}}\limits}
-\newcommand{\aoverbrace}[2][L1U1R]{%
+    \aupbracefill{#1}\crcr\noalign{\kern.5\fontdimen5\textfont2}}}}\limits
+    % ...there was a ^:
+    \IfValueT{#4}{%
+    ^{%
+%FMi
+      \gdef\@abrace@text@arg{#4}%  % save argument then split of portions later
+%FMi
+      \@defbracecharcode{A}{%
+        \@use@rl@se\braceru
+        \makebox[0pt][c]{\scriptsize
+%FMi % split off next part
+            \expandafter\@abrace@next@text\@abrace@text@arg&\@abrace@next@text}%
+%FMi
+        \@use@rl@se\bracelu\@genbrace
+      }%
+      % We interpret U as A
+      \let\brace@char@U\brace@char@A
+%FMi
+      \let\@abrace@stuff\phantom       % render @{...} harmless
+%FMi
+      % Use the normal spec by default
+      \IfValueTF{#3}
+        {\bracescript{#3}}% Use newly-specified spec
+        {\bracescript{#1}}% Use default spec
+%FMi
+      \@abrace@is@arg@fully@used{^}{U}%
+%FMi
+    }%
+  }%
+  % ...there was a _:
+  \IfValueT{#5}{%
+  _{%
+%FMi
+    \gdef\@abrace@text@arg{#5}%
+%FMi
+    \@defbracecharcode{A}{%
+        \@use@rl@se\bracerd
+        \makebox[0pt][c]{%
+          \scriptsize           % not needed if processed in math
+%FMi
+          \expandafter\@abrace@next@text\@abrace@text@arg&\@abrace@next@text}%
+%FMi
+        \@use@rl@se\braceld\@genbrace
+    }%
+    % We interpret D as A
+    \let\brace@char@D\brace@char@A
+%FMi
+      \let\@abrace@stuff\phantom       % render @{...} harmless
+%FMi
+    % Use the normal spec by default
+    \IfValueTF{#3}
+      {\bracescript{#3}}% Use the newly-specified spec
+      {\bracescript{#1}}% Use the default spec
+%FMi
+    \@abrace@is@arg@fully@used{_}{D}%
+%FMi
+    }%
+  }%
+%FMi
+% If there is a second optional argument (#3) but there is neither
+% a ^{..} nor a _{..} then interpret the bracket group was not an optional argument
+% but actually belongs to the current formula, so return it.
+% Order of the test is #3 #5 #4 because an overbrace is more likely to have ^{..}.
+% For underbrace it is #3 #4 #5.
+  \IfValueT{#3}{\IfValueF{#5}{\IfValueF{#4}{[#3]}}}%
+%FMi
+}
+
+%\RequirePackage{unravel}
+
+%FMi
+\def\@abrace@next@text#1&#2\@abrace@next@text{%
+  \gdef\@abrace@text@arg{#2}%
+  %  \TrimArgSpaces{#1}%                 % text solution
+  $\scriptstyle #1$%                     % use math mode instead? I think so
+}
+%FMi
+
+
+
+%FMi
+% check if current value of \@abrace@text@arg contains parts that haven't been used.
+%
+% Possible cases: (a) empty (b) one or more & symbols (c) some & symbol(s) and other stuff
+%
+% (c) is the case we need to generate an error for.
+
+
+\def\@abrace@is@arg@fully@used#1#2{%
+  \edef\abrace@tempa{\detokenize{#1}}%   _ or ^
+  \def\abrace@tempb{#2}%             %   D or U
+  \let\abrace@next\@abrace@is@arg@fully@used@
+  \expandafter\@abrace@is@arg@fully@used@ \@abrace@text@arg \@nil &%
+}
+
+% As we know that here is at least \verb=\@nil &= in the stream ahead
+% we can grep one argument delimited by \verb=&= and then check if it
+% is empty (case (a) or (b)), if it is \verb=\@nil= (we are done) or
+% if it is anything else (case (c)).
+
+
+\def\@abrace@is@arg@fully@used@ #1&{%
+  \def\@abrace@text@arg{#1}%
+  \ifx\@abrace@text@arg\@empty                  % ok case
+  \else
+    \ifx\@abrace@text@arg\@nnil                 % we are done
+      \let\abrace@next\relax
+    \else
+      \PackageError{abraces}{Unused part in \abrace@tempa{...}:\MessageBreak
+                             '\detokenize{#1}' dropped}%
+                            {There have been more \string& symbols than
+                             \abrace@tempb\space or A elements in the pattern.
+                             Check your source!}%
+    \fi
+  \fi
+  \abrace@next
+}    
+%FMi
+
+  
+
+\DeclareDocumentCommand{\aoverbrace}{ O{L1U1R} m o e{^_}}{%
+%
+%  \typeout{Arguments: \detokenize{1=#1|2=#2|3=#3|4=#4|5=#5|}}%
+%    
   \begin{lrbox}{\bracebox}$\displaystyle{#2}$\end{lrbox}%
   \mathop{\vbox{\m@th\ialign{##\crcr
     \noalign{\kern.5\fontdimen5\textfont2}%
     \adownbracefill{#1}\crcr
     \noalign{\kern.7\fontdimen5\textfont2\nointerlineskip}%
-  $\hfil\displaystyle{#2}\hfil$\crcr}}}\limits}
+    $\hfil\displaystyle{#2}\hfil$\crcr}}}\limits
+    % ...there was a ^:
+    \IfValueT{#4}{%
+    ^{%
+      % Define a text point instead of a tip
+%FMi
+      \gdef\@abrace@text@arg{#4}%  % save argument then split of portions later
+%FMi
+      \@defbracecharcode{A}{%
+        \@use@rl@se\braceru
+        \makebox[0pt][c]{\scriptsize
+%FMi % split off next part
+            \expandafter\@abrace@next@text\@abrace@text@arg&\@abrace@next@text}%
+%FMi
+        \@use@rl@se\bracelu\@genbrace
+      }%
+      % We interpret U as A
+      \let\brace@char@U\brace@char@A
+      % Use the normal spec by default
+%FMi
+      \let\@abrace@stuff\phantom       % render @{...} harmless
+%FMi
+      \IfValueTF{#3}
+        {\bracescript{#3}}% Use newly-specified spec
+        {\bracescript{#1}}% Use default spec
+%FMi
+      \@abrace@is@arg@fully@used{^}{U}%
+%FMi
+    }%
+  }%
+  % ...there was a _:
+  \IfValueT{#5}{%
+    _{%
+    % Define a text point instead of a tip
+%FMi
+      \gdef\@abrace@text@arg{#5}%
+%FMi
+    \@defbracecharcode{A}{%
+        \@use@rl@se\bracerd
+        \makebox[0pt][c]{%
+          \scriptsize           % not needed if processed in math
+          %FMi
+          \expandafter\@abrace@next@text\@abrace@text@arg&\@abrace@next@text
+        }%
+%FMi
+        \@use@rl@se\braceld\@genbrace
+    }%
+    % We interpret D as A
+    \let\brace@char@D\brace@char@A
+%FMi
+      \let\@abrace@stuff\phantom       % render @{...} harmless
+%FMi
+    % Use the normal spec by default
+    \IfValueTF{#3}
+              {\bracescript{#3}}% Use the newly-specified spec
+              {\bracescript{#1}}% Use the default spec
+%FMi
+    \@abrace@is@arg@fully@used{_}{D}%
+%FMi
+    }%
+  }%
+%FMi
+  \IfValueT{#3}{\IfValueF{#4}{\IfValueF{#5}{[#3]}}}%
+%FMi
+}
 
 % Parsing structure. Reference:
 %   Parsing a macro argument character-by-character for conditional execution
@@ -89,15 +298,46 @@
 \@defbracecharcode{@}{\@firstofone@go}% Insert arbitrary stuff
 \@defbracecharcode{!}{\@firstofone@len}% Insert a leader of specific length
 \@defbracecharcode{*}{\@repeat@num@times}% Repeat stuff a number of times
+\@defbracecharcode{,}{\downbracketend}% Downward bracket end
+\@defbracecharcode{'}{\upbracketend}% Upward bracket end
 
-\newcommand{\@firstofone@go}[1]{#1\@genbrace}%
+
+%FMi
+%like U or D (same width) but a straight line marking a possible anchor point for annotation material
+% can be used in patterns, e.g., $\aunderbrace[3A1]{a+b+c+d}_{x}$  makes a an underline rule with
+% the "x" being placed off center
+
+\@defbracecharcode{A}{%
+  \setbox\z@\hbox{$\m@th\braceru\bracelu$}%
+  \hb@xt@\wd\z@{\@@bfil}%
+  \@genbrace}%  
+                   
+%FMi
+
+
+\newcommand{\bracecolor}[1]{\xdef\bracecolor@{\noexpand\color{#1}}\aftergroup\bracecolor@}
+%FMi
+\let\bracecolor\color  % no longer needed
+%\newcommand{\@firstofone@go}[1]{\mathord{#1}\@genbrace}%
+\let\@abrace@stuff\@firstofone
+\newcommand{\@firstofone@go}[1]{\mathord{}\@abrace@stuff{#1}\mathord{}\@genbrace}%
+%FMi
+%\newcommand{\@firstofone@go}[1]{#1\@genbrace}%
 \newcommand{\@firstofone@len}[1]{\hb@xt@#1{\@@bfil}\@genbrace}%
 \newcommand{\@repeat@num@times}[2]{\Repeat{#1}{\@genbrace#2\@nnil}\@genbrace}%
 
 \newcommand{\@genbrace}[1]{%
   \ifx\@nnil#1\relax\else
-    \@nameuse{brace@char@#1\expandafter}%
-  \fi%
+%FMi
+    \expandafter\ifx\csname brace@char@#1\endcsname\relax
+    \PackageError{abraces}{Brace pattern '#1' unknown}%
+      {I'll use '0' instead.}%
+      \csname brace@char@0\expandafter\expandafter\expandafter\endcsname
+    \else
+      \csname brace@char@#1\expandafter\expandafter\expandafter\endcsname
+    \fi
+%FMi
+  \fi
 }
 \newcommand{\genbrace}[1]{%
   \@genbrace#1\@nnil%
