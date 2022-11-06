@@ -16,7 +16,7 @@
 % This work consists of the file abraces.sty.
 
 \ProvidesPackage{abraces}% http://ctan.org/pkg/abraces
-  [2021/03/31 v2.0 Arbitrary and asymmetric braces]
+  [2022/11/06 v2.1 Arbitrary and asymmetric braces]
 
 \RequirePackage{xparse}
 
@@ -63,7 +63,7 @@
 %   Repeat command n times?
 %   http://tex.stackexchange.com/q/16189/5764
 \ExplSyntaxOn
-\cs_new_eq:NN \Repeat \prg_replicate:nn
+\cs_new_eq:NN \Repeat@br@ces \prg_replicate:nn
 %FMi
 \cs_new_eq:NN \TrimArgSpaces \tl_trim_spaces:n  % only needed when ^{...} should be text
 %FMi
@@ -194,8 +194,6 @@
 }    
 %FMi
 
-  
-
 \DeclareDocumentCommand{\aoverbrace}{ O{L1U1R} m o e{^_}}{%
 %
 %  \typeout{Arguments: \detokenize{1=#1|2=#2|3=#3|4=#4|5=#5|}}%
@@ -324,7 +322,7 @@
 %FMi
 %\newcommand{\@firstofone@go}[1]{#1\@genbrace}%
 \newcommand{\@firstofone@len}[1]{\hb@xt@#1{\@@bfil}\@genbrace}%
-\newcommand{\@repeat@num@times}[2]{\Repeat{#1}{\@genbrace#2\@nnil}\@genbrace}%
+\newcommand{\@repeat@num@times}[2]{\Repeat@br@ces{#1}{\@genbrace#2\@nnil}\@genbrace}%
 
 \newcommand{\@genbrace}[1]{%
   \ifx\@nnil#1\relax\else
