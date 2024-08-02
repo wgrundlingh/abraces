@@ -1,4 +1,4 @@
-% $Id: abraces-doc.tex,v 2.0 2021/03/31 00:00:00 wgrundlingh stable $
+% $Id: abraces-doc.tex,v 2.2 2024/08/02 00:00:00 wgrundlingh stable $
 \RequirePackage{xcolor}% http://ctan.org/pkg/xcolor (required to "overload" color package)
 \documentclass[10pt]{ltxdockit}[2011/03/25]
 
@@ -7,7 +7,7 @@
 \usepackage{booktabs,shortvrb,amsmath,xfp}
 \MakeShortVerb{\|}
 
-\rcsid{$Id: abraces.tex,v 2.0 2021/03/31 00:00:00 wgrundlingh stable $}
+\rcsid{$Id: abraces.tex,v 2.2 2024/08/02 00:00:00 wgrundlingh stable $}
 %\setcounter{secnumdepth}{2}
 %\setcounter{tocdepth}{4}
 
@@ -305,11 +305,25 @@ This material is released under and subject to the \href{https://latex-project.o
 
 \section{Acknowledgements}
 
-Thanks to Frank Mittlebach who stepped in and suggested an improvement in the original way \sty{abraces} functioned. Expansions included the use of \LaTeX3 command interface (via the \href{http://ctan.org/pkg/xparse}{\sty{xparse} package}).
+Thanks to Frank Mittlebach who stepped in and suggested an improvement in the original way \sty{abraces} functioned. Expansions included the use of \LaTeX3 command interface.
 
 \section{Change log}
 
 \begin{itemize}
+  \item v2.2 (2024-08-02) Minor update
+  
+  \begin{itemize}
+    \item
+    Added \href{http://ctan.org/pkg/xcolor}{\sty{xcolor}} dependency to always have \lstinline|\bracecolor| available.
+  \end{itemize}
+  
+  \item v2.1 (2022-11-06) Minor update
+  
+  \begin{itemize}
+    \item
+    \lstinline|\Repeat| is replaced by something more obscure (\lstinline|\Repeat@br@ces|) to avoid other package conflicts.
+  \end{itemize}
+  
   \item v2.0 (2021-03-31) Major update
   
   \begin{itemize}
